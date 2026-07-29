@@ -1,0 +1,30 @@
+# 1. 本地部署引擎 & 大文件 (Large Local Engines/Models)
+webui_forge_cu124_torch24/
+
+# 2. 敏感配置文件 (Environment & Credentials)
+.env
+
+# 3. 运行时生成图片 (Generated Images Output)
+generated_images/*
+!generated_images/.gitkeep
+
+# 4. 临时日志与日志文件 (Logs and Output Dumps)
+stdout_out.txt
+stderr_out.txt
+*.log
+
+# 5. Python 编译缓存 (Python Cache)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 6. Python 虚拟环境 (Virtual Environments)
+venv/
+.venv/
+env/
+
+# 7. IDE & 系统文件 (IDE & System Metadata)
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

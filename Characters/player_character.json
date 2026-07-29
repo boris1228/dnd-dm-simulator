@@ -1,0 +1,128 @@
+{
+  "basic_info": {
+    "name": "科尔·灰盾",
+    "race": "人类",
+    "class": "牧师",
+    "subclass": "光明领域",
+    "background": "公会工匠",
+    "alignment": "守序中立",
+    "level": 1,
+    "experience": 0,
+    "experience_to_next_level": 300,
+    "age": 22,
+    "appearance": "年轻男性人类，肩宽臂壮，双手布满老茧。浅棕色短发，灰蓝色眼睛，常穿旅行斗篷，胸前挂着一枚旭日形圣徽。"
+  },
+  "ability_scores": {
+    "strength": { "score": 17, "modifier": 3 },
+    "dexterity": { "score": 14, "modifier": 2 },
+    "constitution": { "score": 18, "modifier": 4 },
+    "intelligence": { "score": 14, "modifier": 2 },
+    "wisdom": { "score": 19, "modifier": 4 },
+    "charisma": { "score": 5, "modifier": -3 }
+  },
+  "proficiency_bonus": 2,
+  "saving_throws": {
+    "strength": false,
+    "dexterity": false,
+    "constitution": false,
+    "intelligence": false,
+    "wisdom": true,
+    "charisma": true
+  },
+  "combat": {
+    "max_hp": 12,
+    "current_hp": 12,
+    "temp_hp": 0,
+    "armor_class": 16,
+    "initiative_bonus": 2,
+    "speed": 30,
+    "death_saves": {
+      "successes": 0,
+      "failures": 0
+    }
+  },
+  "skills": {
+    "athletics": { "proficient": false, "bonus": 3 },
+    "acrobatics": { "proficient": false, "bonus": 2 },
+    "sleight_of_hand": { "proficient": false, "bonus": 2 },
+    "stealth": { "proficient": false, "bonus": 2 },
+    "arcana": { "proficient": false, "bonus": 2 },
+    "history": { "proficient": false, "bonus": 2 },
+    "investigation": { "proficient": false, "bonus": 2 },
+    "nature": { "proficient": false, "bonus": 2 },
+    "religion": { "proficient": true, "bonus": 4 },
+    "animal_handling": { "proficient": false, "bonus": 4 },
+    "insight": { "proficient": true, "bonus": 6 },
+    "medicine": { "proficient": true, "bonus": 6 },
+    "perception": { "proficient": false, "bonus": 4 },
+    "survival": { "proficient": false, "bonus": 4 },
+    "deception": { "proficient": false, "bonus": -3 },
+    "intimidation": { "proficient": false, "bonus": -3 },
+    "performance": { "proficient": false, "bonus": -3 },
+    "persuasion": { "proficient": true, "bonus": -1 }
+  },
+  "passive_scores": {
+    "passive_perception": 14,
+    "passive_insight": 16,
+    "passive_investigation": 12
+  },
+  "weapons": [
+    {
+      "name": "战锤",
+      "attack_bonus": 5,
+      "damage": "1d10+3",
+      "damage_type": "钝击",
+      "range": "近战"
+    },
+    {
+      "name": "轻弩",
+      "attack_bonus": 4,
+      "damage": "1d8+2",
+      "damage_type": "穿刺",
+      "range": "80/320 尺"
+    }
+  ],
+  "spellcasting": {
+    "is_spellcaster": true,
+    "spellcasting_ability": "wisdom",
+    "spell_attack_bonus": 6,
+    "spell_save_dc": 14,
+    "spell_slots": {
+      "level_1": { "total": 2, "used": 0 },
+      "level_2": { "total": 0, "used": 0 }
+    },
+    "cantrips_known": ["光亮术", "圣火术", "指导术"],
+    "spells_prepared": ["祝福术", "治疗轻伤", "神导箭", "护盾术", "侦测魔法", "燃烧之手", "妖火"],
+    "spellbook": []
+  },
+  "class_features": [
+    "法术施展（牧师）",
+    "神圣领域：光明（额外戏法：光亮术；领域法术：燃烧之手、妖火；特性：光耀闪避）"
+  ],
+  "equipment": {
+    "equipped": ["鳞甲", "盾牌", "战锤", "圣徽（旭日形，兰萨德尔）"],
+    "backpack": [
+      "牧师套组",
+      "轻弩与20支弩箭",
+      "工匠工具（铁匠）",
+      "公会介绍信",
+      "旅行装",
+      "5gp（套组剩余）"
+    ],
+    "currency": {
+      "gp": 15,
+      "sp": 0,
+      "cp": 0
+    }
+  },
+  "languages": ["通用语", "矮人语"],
+  "background_story": {
+    "backstory": "科尔在剑湾一座城镇的铁匠公会长大，手艺扎实，话却不多。某次工坊事故中，他徒手从塌落的铁架下拖出两名学徒——事后他说不清是哪里来的力气，只记得那一刻脑海中有一轮旭日骤然亮起。此后他离开公会，在兰萨德尔神殿受训，成为光明领域的侍僧，如今沿商路北行，寻找能够施展神术的地方。",
+    "personal_goals": ["证明神迹并非偶然，找到属于自己的神职道路"],
+    "bonds": "铁匠公会的师傅仍在他家乡；他欠师傅一条命。",
+    "flaws": "极不擅言辞与社交，常把场面弄僵；说话直来直去，容易冒犯人。",
+    "personality_traits": "做事一丝不苟，习惯先动手再说话；对弱者和伤者有本能的保护欲。"
+  },
+  "conditions": [],
+  "notes": "属性生成：4d6弃最低×6 → 18/17/16/13/13/4，按牧师需求分配后人类+1全属性。CHA 5 为真实掷骰结果。"
+}

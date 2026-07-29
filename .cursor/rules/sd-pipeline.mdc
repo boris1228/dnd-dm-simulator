@@ -1,0 +1,117 @@
+---
+description: Rules and configurations for Stable Diffusion API image generation pipeline.
+globs: "*.py, src/**/*.py, pipeline/**/*.py"
+---
+
+# SD Pipeline Rules
+# D&D Real-Time Image Generation Pipeline Rules
+
+这份文档定义了 Stable Diffusion API 在 D&D 跑团自动化系统中的模型路由逻辑、渲染参数与 Prompt 拼接规则。
+
+---
+
+## 1. 场景路由与模型选择 (Model Routing)
+
+根据 DM 生成的剧情事件类型，自动切换至对应的 Checkpoint/LoRA 及参数配置。
+
+| 场景类型 (Scene Type) | 推荐 Checkpoint / LoRA | 目标风格 | 核心优势 |
+| :--- | :--- | :--- | :--- |
+| **角色 / NPC / 实时对话** | `DreamShaper 8 LCM` + `<lora:DD_Painterly:1>` | D&D 5e 官方规则书插画风 | 极速响应（<1s），极佳的手绘质感 |
+| **战术地图 (Battlemap)** | `dndMapGenerator_v3.safetensors` | 2D 俯视战术战斗地图 | 布局清晰，支持带网格/无网格生成 |
+| **剧情高潮 / 区域大地图** | `dndCoverArt_v10_SD1.safetensors` | 高精精美画册封面 / 羊皮纸大地图 | 画质极高，光影与构图具有史诗感 |
+
+---
+
+## 2. 各场景详细配置规范 (Configurations)
+
+### 场景一：角色与常规剧情 (Characters & Real-time Narrative)
+> **适用**：NPC 登场、玩家角色展示、实时发生的常规剧情交互。
+
+* **Checkpoint**: `DreamShaper 8 LCM`
+* **LoRA**: `<lora:DD_Painterly:1>`
+* **Sampler**: `LCM` (或 `Euler a`)
+* **Steps**: `6 ~ 8`
+* **CFG Scale**: `1.5 ~ 2.0` *(注意：LCM 必须低 CFG)*
+* **Resolution**: `512 x 768` (纵向) 或 `768 x 768`
+* **Prompt Template**:
+  * **Positive**: `(masterpiece, top quality:1.2), DD_Painterly, official D&D illustration style, painterly texture, {LLM_DESCRIPTION}`
+  * **Negative**: `(worst quality, low quality:1.4), 3d render, smooth skin, plastic, modern clothing, ugly, lowres, watermark`
+
+---
+
+### 场景二：战术战斗地图 (Tactical Battlemaps)
+> **适用**：进入战斗轮、地下城探索、房间/酒馆布局。
+
+* **Checkpoint**: `dndMapGenerator_v3.safetensors`
+* **Sampler**: `DPM++ 2M Karras` 或 `Euler a`
+* **Steps**: `20 ~ 25`
+* **CFG Scale**: `7.0`
+* **Resolution**: `768 x 768` 或 `1024 x 1024` (正方形更易对齐)
+* **Prompt Template**:
+  * **Positive (无网格/VTT用)**: `2d dnd battlemap, top-down view, gridless, {LLM_MAP_DESCRIPTION}`
+  * **Positive (自带网格/实体用)**: `2d dnd battlemap, top-down view, square grid, gridded battlemap, {LLM_MAP_DESCRIPTION}`
+  * **Negative (无网格模式必须包含 grid 排除词)**: `grid, hex grid, 3d, perspective, isometric, characters, people, monsters, text, watermark, (worst quality, low quality:1.4), blurry`
+
+---
+
+### 场景三：剧情高潮封面与区域大地图 (Cover Art & Regional Maps)
+> **适用**：章节开篇、BOSS 终局对决、高潮插画、羊皮纸世界大地图。
+
+* **Checkpoint**: `dndCoverArt_v10_SD1.safetensors`
+* **VAE**: `vae-ft-mse-840000-ema-pruned.vae.pt`
+* **Sampler**: `DPM++ 2M Karras`
+* **Steps**: `20`
+* **CFG Scale**: `7.0`
+* **Resolution**: `512 x 768` (封面) 或 `768 x 512` (大地图)
+* **Prompt Template**:
+  * **剧情高潮插画**:
+    * **Positive**: `dnd cover art, book cover illustration, official D&D style, epic cinematic fantasy, {LLM_EPIC_DESCRIPTION}`
+    * **Negative**: `text, title, logo, watermark, typography, signature, words, (worst quality, low quality:1.4), 3d render`
+  * **羊皮纸区域大地图**:
+    * **Positive**: `dnd cover art, 2d dnd map, fantasy regional map, top-down view, aged parchment style, cartography style, detailed terrain, {LLM_REGION_DESCRIPTION}`
+    * **Negative**: `text, title, logo, watermark, signature, 3d render, photo, low quality`
+
+---
+
+## 3. Cursor 代码调用示例 (Python API Payload)
+
+```python
+def build_sd_payload(scene_type: str, description: str, needs_grid: bool = False) -> dict:
+    if scene_type == "character":
+        return {
+            "override_settings": {"sd_model_checkpoint": "DreamShaper_8_LCM.safetensors"},
+            "sampler_name": "LCM",
+            "steps": 8,
+            "cfg_scale": 2.0,
+            "width": 512,
+            "height": 768,
+            "prompt": f"(masterpiece, top quality:1.2), DD_Painterly, official D&D illustration style, painterly texture, {description}, <lora:DD_Painterly:1>",
+            "negative_prompt": "(worst quality, low quality:1.4), 3d render, smooth skin, plastic, modern clothing, ugly, lowres"
+        }
+    elif scene_type == "battlemap":
+        grid_keyword = "square grid, gridded battlemap," if needs_grid else "gridless,"
+        negative_grid = "" if needs_grid else "grid, hex grid,"
+        return {
+            "override_settings": {"sd_model_checkpoint": "dndMapGenerator_v3.safetensors"},
+            "sampler_name": "DPM++ 2M Karras",
+            "steps": 20,
+            "cfg_scale": 7.0,
+            "width": 768,
+            "height": 768,
+            "prompt": f"2d dnd battlemap, top-down view, {grid_keyword} {description}",
+            "negative_prompt": f"{negative_grid} 3d, perspective, isometric, characters, text, watermark, low quality, blurry"
+        }
+    elif scene_type in ["cover", "regional_map"]:
+        return {
+            "override_settings": {
+                "sd_model_checkpoint": "dndCoverArt_v10_SD1.safetensors",
+                "sd_vae": "vae-ft-mse-840000-ema-pruned.vae.pt"
+            },
+            "sampler_name": "DPM++ 2M Karras",
+            "steps": 20,
+            "cfg_scale": 7.0,
+            "width": 512 if scene_type == "cover" else 768,
+            "height": 768 if scene_type == "cover" else 512,
+            "prompt": f"dnd cover art, book cover illustration, official D&D style, {description}",
+            "negative_prompt": "text, title, logo, watermark, typography, signature, words, (worst quality, low quality:1.4), 3d render"
+        }
