@@ -24,7 +24,7 @@ def _base_url() -> str:
 
 async def check_forge_health() -> None:
     """Mandatory pre-flight ping — fail fast if Forge is not running."""
-    url = f"{_base_url()}/sdapi/v1/sd-models"
+    url = f"{_base_url()}/sdapi/v1/options"
     logger.info("Checking Forge health at %s", url)
 
     async with httpx.AsyncClient(timeout=HEALTH_CHECK_TIMEOUT_S) as client:

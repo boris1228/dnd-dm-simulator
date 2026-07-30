@@ -103,8 +103,15 @@ async def extract_tags(description: str, scene_type: SceneType) -> str:
             "LLM_BASE_URL is not set. Provide --english-tags or configure LLM_BASE_URL."
         )
 
+    # 1. 防呆纠错：如果 base_url 包含了 /chat/completions，先剥离掉
+    if base_url.endswith("/chat/completions"):
+        base_url = base_url[:-17].rstrip("/")
+
+    # 2. 修改默认模型为 Gemini 2.0/1.5 Flash，并防呆移除 "models/" 前缀
+    raw_model = os.environ.get("LLM_MODEL", "gemini-2.0-flash")
+    model = raw_model.replace("models/", "")
+
     api_key = os.environ.get("LLM_API_KEY", "")
-    model = os.environ.get("LLM_MODEL", "gpt-4o-mini")
     scene_hint = _SCENE_HINTS.get(scene_type, "")
 
     headers: dict[str, str] = {"Content-Type": "application/json"}
@@ -125,7 +132,7 @@ async def extract_tags(description: str, scene_type: SceneType) -> str:
     }
 
     url = f"{base_url}/chat/completions"
-    logger.info("Extracting SD tags via LLM (%s)", model)
+    logger.info("Extracting SD tags via LLM (%s) at %s", model, url)
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
